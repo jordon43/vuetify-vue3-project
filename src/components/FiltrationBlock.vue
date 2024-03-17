@@ -50,20 +50,15 @@
                         class="checkbox-item"
                         hide-details=true
                         v-for="contact in entities.type_contact"
+                        v-model="filterParams.ids_type_contract"
                         :label="contact.slug"
                         :key="contact.id"
-                        @change="(e)=>{
-                            let index = filterParams.ids_type_contract.indexOf(contact);
-                            index === -1
-                            ? filterParams.ids_type_contract.push(contact)
-                            : filterParams.ids_type_contract.splice(index, 1)
-                      }"
+                        :value="contact"
                     ></v-checkbox>
                 </div>
 
             </v-col>
         </v-row>
-
         <v-row>
             <v-col>
                 <v-btn class="btnApplyFiltered"
@@ -110,7 +105,6 @@ const resetFilters = () => {
         county: {id: null, title: 'Все страны'},
         position: {id: null, name: 'Все должности'},
         ids_type_contract: [],
-        ids_tag: []
     };
 
 }

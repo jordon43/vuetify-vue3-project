@@ -19,27 +19,29 @@
                         </div>
                         <p class="textListWorkers">Список сотрудников</p>
                         <ButtonsGroup
-                            :ids_tag = "ids_tag"
+                            :ids_tag = "selectedTagFiltration"
                             :staff_tag="entities.staff_tag"
-                            @selectedAllList="ids_tag.splice(0, ids_tag.length)"
+                            @selectedAllList="selectedTagFiltration.splice(0, selectedTagFiltration.length)"
                             @changeFilterParams="(btn)=>{
-                                let index = ids_tag.indexOf(btn);
+                                let index = selectedTagFiltration.indexOf(btn);
                                 index === -1 ?
-                                ids_tag.push(btn) :
-                                ids_tag.splice(index, 1)
+                                selectedTagFiltration.push(btn) :
+                                selectedTagFiltration.splice(index, 1)
                             }"
                         >
                         </ButtonsGroup>
 
                         <ListWorkers
-                            :filteredWorkers="filteredWorkersFunction">
+                            :filteredWorkers="filteredWorkersComputed.slice(0, maxVisibleWorkers)">
                         </ListWorkers>
 
                         <div class="blockUpdateList">
                             <v-btn
                                 class="btnUpdateList"
-                                v-if="maxVisibleWorkres < store.workers.length"
-                                @click="maxVisibleWorkres += 4"
+                                v-if="isFiltered || selectedTagFiltration.length !==0
+                                ? maxVisibleWorkers < lengthFilteredWorkers
+                                : maxVisibleWorkers < store.workers.length"
+                                @click="maxVisibleWorkers += 4"
                             ><v-icon left>mdi-update</v-icon>
                               Показать ещё</v-btn>
                         </div>
@@ -53,7 +55,7 @@
                         >
                         </DialogNewWorker>
                         <FiltrationBlock
-                            @applyFiltered = "filteredWorkersDemo"
+                            @applyFiltered = "filteredWorkersStatic"
                             @resetFilters = "isFiltered = false"
                         ></FiltrationBlock>
                     </div>
@@ -79,10 +81,13 @@ const store = useStore()
 const search = ref('');
 const isFiltered = ref(false)
 const filteredWorkers = ref([])
-const maxVisibleWorkres = ref(4)
+const maxVisibleWorkers = ref(4)
 const dialog = ref(false);
-const ids_tag = ref([])
-const filteredWorkersDemo = (filterParams) => {
+const selectedTagFiltration = ref([])
+const lengthFilteredWorkers = ref(0)
+
+
+const filteredWorkersStatic = (filterParams) => {
     isFiltered.value = true
     filteredWorkers.value = store.workers
     .filter((worker)=>{
@@ -110,20 +115,19 @@ const filteredWorkersDemo = (filterParams) => {
     .filter((worker) => worker.full_name.indexOf(search.value) === 0)
 }
 
-const filteredWorkersFunction = computed(() => {
+const filteredWorkersComputed = computed(() => {
     let dataFiltered = isFiltered.value ? filteredWorkers.value : store.workers
-
-    if (ids_tag.value.length !== 0) {
+    if (selectedTagFiltration.value.length !== 0) {
         dataFiltered = dataFiltered.filter((worker)=>{
-            return ids_tag.value
+            return selectedTagFiltration.value
                 .map((item) => item.id)
                 .includes(worker.status.tag.id)
         })
     }
-
+    dataFiltered = dataFiltered
+        .filter((worker) => worker.full_name.toLowerCase().indexOf(search.value.toLowerCase()) === 0)
+    lengthFilteredWorkers.value = dataFiltered.length
     return dataFiltered
-        .filter((worker) => worker.full_name.indexOf(search.value) === 0)
-        .slice(0, maxVisibleWorkres.value)
 });
 
 
@@ -137,7 +141,7 @@ function addUser(newUser) {
 }
 
 
-</script>@/entities
+</script>
 
 <style lang="sass">
 
@@ -156,8 +160,7 @@ function addUser(newUser) {
     .main
         background-color: white
         .searchBlock
-            border-bottom: black 1px solid
-            border-color: #DBE4ED
+            border-bottom: #DBE4ED 1px solid
             padding: 30px 30px
             .v-input
                 border-radius: 4px
@@ -165,33 +168,29 @@ function addUser(newUser) {
                 border: none !important
 
             .v-field__outline__start
-                border-radius: 4px
                 border-right: none
-                border-top-right-radius: 0
-                border-bottom-right-radius: 0
+                border-radius: 4px 0 0 4px
                 border-color: #E0EBEF
             .v-field__outline__end
                 border-left: none
-                border-radius: 4px
-                border-top-left-radius: 0
-                border-bottom-left-radius: 0
+                border-radius: 0 4px 4px 0
                 border-color: #E0EBEF
             .searchInput
                 background-color: #E8F1F4
-                font-family: Montserrat-Regular
+                font-family: Montserrat-Regular, serif
                 font-size: 15px
                 .v-field__input
                     min-height: 46px
             .helpText
                 color: #B0BCC7
-                font-family: Montserrat-Regular
+                font-family: Montserrat-Regular, serif
                 padding-top: 10px
                 font-size: 13px
                 font-weight: lighter
 
         .textListWorkers
             padding: 30px 30px 0 40px
-            font-family: Montserrat-SemiBold
+            font-family: Montserrat-SemiBold, serif
             font-size: 26px
             color: #041423
     .rightBlock
@@ -203,7 +202,7 @@ function addUser(newUser) {
     padding-bottom: 30px
     .btnUpdateList
         text-transform: unset !important
-        font-family: Montserrat-Medium
+        font-family: Montserrat-Medium, serif
         height: 46px
         border: #2A358C solid 1px
         box-shadow: none

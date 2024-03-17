@@ -60,6 +60,7 @@
 
                         <v-select
                             v-model="newUser.type_contract"
+                            autocomplete="off"
                             label="Тип договора"
                             return-object
                             :items="entities.type_contact"
@@ -68,6 +69,7 @@
 
                         <v-select
                             v-model="newUser.gender"
+                            autocomplete="off"
                             :items="entities.gender"
                             return-object
                             label="Пол"
@@ -76,6 +78,7 @@
 
                         <v-select
                             v-model="newUser.county"
+                            autocomplete="off"
                             :items="entities.county"
                             return-object
                             label="Гражданство"
@@ -84,6 +87,7 @@
 
                         <v-select
                             v-model="newUser.position"
+                            autocomplete="off"
                             :rules="[value => !!newUser.position || 'Обязательно для выбора']"
                             :item-props="(item) => {return {title: item.name}}"
                             :items="entities.position"
@@ -94,10 +98,12 @@
                         <p class="statusTextAddWorkerContent">Статус:</p>
                         <v-select
                             v-model="newUser.status.tag"
+                            autocomplete="off"
                             label="Выберете тег"
                             :items="entities.staff_tag"
                             :rules="[value => !!newUser.status.tag || 'Обязательно для выбора']"
                             return-object
+
                         ></v-select>
 
                         <v-text-field
@@ -234,9 +240,9 @@ const addUser = () => {
         text-transform: uppercase
 
 
-.addWorkerCard
-    margin: 0 auto
-    width: 60%
+.v-dialog
+    max-width: 60%
+    margin: auto
     .titleWorkerCard
         text-align: center
         font-size: 30px
@@ -263,7 +269,8 @@ const addUser = () => {
             color: white
 
 @media screen and (max-width: 1200px)
-    .addWorkerCard
-        width: 95%
+    .v-dialog
+        max-width: 95%
+        margin: auto
 
 </style>
